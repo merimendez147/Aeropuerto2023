@@ -13,7 +13,7 @@ public class Aeropuerto {
         int cantidadPuestosAtencion = 4;
         int cantidadPasajeros = 100;
         int cantTerminales = 4;
-        int cantCajasFreeShop = 2;
+        int cantCajasFreeShop = 3;
         Guardia guardias[] = new Guardia[cantidadPuestosAtencion];//un guardia por cada puesto de atencion
         PuestoAtencion[] puestoAtencion = new PuestoAtencion[cantidadPuestosAtencion];
         for (int i = 0; i <= cantidadPuestosAtencion; i++) {
