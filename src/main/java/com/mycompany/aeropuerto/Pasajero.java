@@ -13,16 +13,14 @@ import java.util.Random;
 public class Pasajero implements Runnable {
 
     PuestoInformes puestoInformes;
-    Guardia guardia;
-    PuestoAtencion puestoAtencion;
+    ZonaCheckIn zonaCheckIn;
     Tren tren;
     FreeShop freeShop;
     PuestoEmbarque puestoEmbarque;
 
-    public Pasajero(PuestoInformes pInformes, Guardia g, PuestoAtencion pAtencion, Tren t, FreeShop fShop, PuestoEmbarque pEmbarque) {
+    public Pasajero(PuestoInformes pInformes, ZonaCheckIn zci, Tren t, FreeShop fShop, PuestoEmbarque pEmbarque) {
         this.puestoInformes = pInformes;
-        this.guardia = g;
-        this.puestoAtencion = pAtencion;
+        this.zonaCheckIn = zci;
         this.tren = t;
         this.freeShop = fShop;
         this.puestoEmbarque = pEmbarque;

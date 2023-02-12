@@ -14,16 +14,15 @@ public class Aeropuerto {
         int cantidadPasajeros = 100;
         int cantTerminales = 4;
         int cantCajasFreeShop = 3;
-        Guardia guardias[] = new Guardia[cantidadPuestosAtencion];//un guardia por cada puesto de atencion
-        PuestoAtencion[] puestoAtencion = new PuestoAtencion[cantidadPuestosAtencion];
-        for (int i = 0; i <= cantidadPuestosAtencion; i++) {
-            puestoAtencion[i] = new PuestoAtencion(i);
-            guardias[i] = new Guardia(puestoAtencion[i], i);
-        }
+        PuestoInformes puestoInformes= new PuestoInformes(cantidadPuestosAtencion);
+        ZonaCheckIn zonaCheckIn = new ZonaCheckIn(cantidadPuestosAtencion);
+        Tren tren = new Tren();
+        FreeShop freeShop = new FreeShop(cantCajasFreeShop);
+        PuestoEmbarque puestoEmbarque = new PuestoEmbarque();
+      
         Thread[] pasajeros = new Thread[cantidadPasajeros];
         for (int i = 0; i <= cantidadPasajeros; i++) {
-            int puestoAtencionAerolinea = (int)(Math.random()*cantidadPuestosAtencion);
-            pasajeros[i] = new Thread(new Pasajero(puestoAtencionAerolinea));
+            pasajeros[i] = new Thread(new Pasajero(puestoInformes, zonaCheckIn, tren, freeShop, puestoEmbarque));
             pasajeros[i].setName("Pasajero" + (i + 1));
             pasajeros[i].start();
         }
