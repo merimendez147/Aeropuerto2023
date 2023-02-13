@@ -8,6 +8,6 @@ package com.mycompany.aeropuerto;
  *
  * @author Academica
  */
-public class Tren {
+public class GestorColaEspera {
     
 }

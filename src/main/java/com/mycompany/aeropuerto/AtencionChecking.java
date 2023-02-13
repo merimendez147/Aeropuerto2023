@@ -8,11 +8,6 @@ package com.mycompany.aeropuerto;
  *
  * @author Academica
  */
-public class FreeShop {
-
-    int cantCajasFreeShop;
-
-    public FreeShop(int cantCajas) {
-        this.cantCajasFreeShop = cantCajas;
-    }
+public class AtencionChecking {
+    
 }
