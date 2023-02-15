@@ -4,10 +4,17 @@
  */
 package com.mycompany.aeropuerto;
 
+import java.util.concurrent.ArrayBlockingQueue;
+
 /**
  *
  * @author Academica
  */
 public class GestorChecking {
+    int max = 20;
+    ArrayBlockingQueue<Pasajero> colaEspera;
     
+    public GestorChecking() {
+        colaEspera = new ArrayBlockingQueue<>(max);
+    }
 }

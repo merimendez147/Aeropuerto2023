@@ -13,36 +13,47 @@ import java.util.logging.Logger;
  * @author Academica
  */
 public class GestorInformes {
-    
-    Semaphore semPasajero= new Semaphore(0);
-    Semaphore semAtencionInformes = new Semaphore (0);
-    Semaphore mutexAtencion = new Semaphore (1);
-    
-    public GestorInformes(){
-        
+
+    Semaphore semPasajero = new Semaphore(0);
+    Semaphore semAtencionInformes = new Semaphore(0);
+    // Semaphore mutexAtencion = new Semaphore(1);
+    int cantPuestoChecking;
+    int cantPasajeros;
+
+    public GestorInformes(int cantPuestos, int cantPasajeros) {
+        this.cantPasajeros = cantPasajeros;
+        this.cantPuestoChecking = cantPasajeros;
+
     }
-    
-    public void solicitarAtencionInformes(){
+
+    public int cantidadPasajeros() {
+        return this.cantPasajeros;
+    }
+
+    public void solicitarAtencionInformes() {
         semAtencionInformes.release();
     }
-    
-    public void consultarPuestoChecking(){
+
+    public int consultarPuestoChecking() {
+        int puestoAtencionAerolinea = 0;
         try {
             semPasajero.acquire();
+            puestoAtencionAerolinea = (int) (Math.random() * cantPuestoChecking);
         } catch (InterruptedException ex) {
             Logger.getLogger(GestorInformes.class.getName()).log(Level.SEVERE, null, ex);
         }
+        return puestoAtencionAerolinea;
     }
-    
-    public void esperarPasajero(){
+
+    public void esperarPasajero() {
         try {
             semAtencionInformes.acquire();
         } catch (InterruptedException ex) {
             Logger.getLogger(GestorInformes.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
-    public void atenderPasajero(){
+
+    public void atenderPasajero() {
         semPasajero.release();
     }
 }

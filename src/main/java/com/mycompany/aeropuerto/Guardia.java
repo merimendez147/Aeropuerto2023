@@ -8,6 +8,16 @@ package com.mycompany.aeropuerto;
  *
  * @author Academica
  */
-public class Guardia {
-    
+public class Guardia implements Runnable {
+
+    GestorColaEspera colaEspera;
+
+    public Guardia(GestorColaEspera colaEspera) {
+        this.colaEspera = colaEspera;
+    }
+
+    @Override
+    public void run() {
+
+    }
 }
