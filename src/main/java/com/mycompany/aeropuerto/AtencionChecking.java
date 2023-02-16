@@ -8,6 +8,17 @@ package com.mycompany.aeropuerto;
  *
  * @author Academica
  */
-public class AtencionChecking {
-    
+public class AtencionChecking implements Runnable {
+
+    GestorColaEspera colaEspera;
+
+    public AtencionChecking(GestorColaEspera colaE) {
+        this.colaEspera = colaE;
+    }
+
+    @Override
+    public void run() {
+
+    }
+
 }

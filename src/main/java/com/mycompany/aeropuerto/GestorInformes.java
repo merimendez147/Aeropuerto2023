@@ -22,7 +22,7 @@ public class GestorInformes {
 
     public GestorInformes(int cantPuestos, int cantPasajeros) {
         this.cantPasajeros = cantPasajeros;
-        this.cantPuestoChecking = cantPasajeros;
+        this.cantPuestoChecking = cantPuestos;
 
     }
 

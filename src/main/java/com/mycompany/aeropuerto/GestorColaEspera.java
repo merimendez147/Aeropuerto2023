@@ -4,6 +4,7 @@
  */
 package com.mycompany.aeropuerto;
 
+
 /**
  *
  * @author Academica
@@ -11,12 +12,13 @@ package com.mycompany.aeropuerto;
 public class GestorColaEspera {
 
     int cantPuestosChecking;
-    ColaEspera[] colaPuestos;
+    ColaEspera [] colaPuestos;
 
     public GestorColaEspera(int cantPuestos) {
         this.cantPuestosChecking = cantPuestos;
-        for (int i = 0; i <= this.cantPuestosChecking; i++) {
-            colaPuestos[i] = new ColaEspera();
+        colaPuestos = new ColaEspera[cantPuestosChecking];
+        for (int i = 0; i < cantPuestosChecking; i++) {
+            colaPuestos[i]=new ColaEspera();
 
         }
     }
@@ -24,4 +26,5 @@ public class GestorColaEspera {
     public void hacerColaChecking(Pasajero pasajero, int puestoChecking) {
         colaPuestos[puestoChecking].hacerCola(pasajero);
     }
+
 }
