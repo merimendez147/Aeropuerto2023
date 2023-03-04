@@ -4,6 +4,7 @@
  */
 package com.mycompany.aeropuerto;
 
+import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -32,9 +33,13 @@ public class GestorChecking {
         puestoCheckingLibre = false;
     }
 
-    public synchronized void liberarPuestoChecking() {
+    public synchronized char liberarPuestoChecking() {
+        Random random = new Random();
+        char terminal = (char) (random.nextInt(3) + 'A');
+        System.out.println(Thread.currentThread().getName() + " se asigno la Terminal  " + terminal);
         puestoCheckingLibre = false;
-        //System.out.println("El  puesto de checking " + nroPuestoChecking + " se libero ");
+        notify();
+        return terminal;
     }
 
 }

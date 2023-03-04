@@ -12,26 +12,28 @@ public class Pasajero implements Runnable {
 
     GestorInformes informes;
     GestorColaEspera colaEspera;
+    GestorTransporte gestorTransporte;
+    char terminal;
 
     int puestoChecking;
     boolean avanza = false;
 
-    public Pasajero(GestorInformes informes, GestorColaEspera colaEspera) {
+    public Pasajero(GestorInformes informes, GestorColaEspera colaEspera, GestorTransporte gestorT) {
         this.informes = informes;
         this.colaEspera = colaEspera;
-
+        this.gestorTransporte = gestorT;
     }
 
     public String nombre() {
         return Thread.currentThread().getName();
     }
-    
-    public boolean avanzaPasajero(){
+
+    public boolean avanzaPasajero() {
         return this.avanza;
     }
-    
-    public void avanzarPasajero(){
-        this.avanza=true;
+
+    public void avanzarPasajero() {
+        this.avanza = true;
     }
 
     @Override
@@ -41,8 +43,9 @@ public class Pasajero implements Runnable {
         puestoChecking = informes.consultarPuestoChecking();
         System.out.println("El pasajero " + Thread.currentThread().getName() + " tiene que ir al puesto de Checking " + puestoChecking);
         colaEspera.hacerColaChecking(this, puestoChecking); //inserta al pasajero en la cola del puesto de Checking
-        colaEspera.hacerChecking(puestoChecking);
-        System.out.println("El pasajero " + Thread.currentThread().getName() + " hizo el Checking en el puesto" + puestoChecking);
-        
+        terminal = colaEspera.hacerChecking(puestoChecking);
+        System.out.println("El pasajero " + Thread.currentThread().getName() + " hizo el Checking en el puesto " + puestoChecking + " tiene que ir a la Terminal " + terminal);
+        gestorTransporte.subirTren(terminal);
+        gestorTransporte.bajarTren(terminal);
     }
 }
