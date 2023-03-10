@@ -13,18 +13,24 @@ public class Aeropuerto {
     public static void main(String[] args) {
         int cantPasajeros = 10;
         int cantPuestosChecking = 4;
-        int capacidadTren=5;
+        int catidadTerminales = 3;
+        int capacidadTren = 5;
         GestorInformes informes = new GestorInformes(cantPuestosChecking, cantPasajeros);
-        GestorColaEspera colaEspera = new GestorColaEspera(cantPuestosChecking);
+        GestorChecking colaEspera = new GestorChecking(cantPuestosChecking);
         GestorTransporte gestorTransporte = new GestorTransporte(capacidadTren);
-        
+        GestorSalasEmbarque gestorSalaEmbarque = new GestorSalasEmbarque(catidadTerminales);
+
         Thread atencionInformes = new Thread(new AtencionInformes(informes));
         atencionInformes.setName("Atencion Informes");
         atencionInformes.start();
         
+        Thread transporte = new Thread(new Transporte(gestorTransporte, capacidadTren,cantPasajeros));
+        transporte.setName("TransporteTerminal");
+        transporte.start();
+
         Thread[] pasajeros = new Thread[cantPasajeros];
         for (int j = 0; j < cantPasajeros; j++) {
-            pasajeros[j] = new Thread(new Pasajero(informes, colaEspera,gestorTransporte));
+            pasajeros[j] = new Thread(new Pasajero(informes, colaEspera, gestorTransporte, gestorSalaEmbarque));
             pasajeros[j].setName("Pasajero" + (j + 1));
             pasajeros[j].start();
         }

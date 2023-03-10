@@ -22,7 +22,7 @@ public class AtencionInformes implements Runnable {
         for (int i = 0; i < cantPasajeros; i++) {
             informes.esperarPasajero();
             informes.atenderPasajero();
-            System.out.println(Thread.currentThread().getName()+ " atendio al pasajero");
+            System.out.println(Thread.currentThread().getName()+ " atendio un pasajero");
         }
     }
 }

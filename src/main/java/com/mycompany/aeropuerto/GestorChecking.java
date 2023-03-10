@@ -4,42 +4,41 @@
  */
 package com.mycompany.aeropuerto;
 
-import java.util.Random;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 /**
  *
  * @author Academica
  */
 public class GestorChecking {
 
-    private Boolean puestoCheckingLibre = true;
-    private final int nroPuestoChecking;
+    int cantPuestosChecking;
+    ColaChecking[] colaPuestos;
+    PuestoChecking[] gestorChecking;
 
-    public GestorChecking(int nroPuesto) {
-        this.nroPuestoChecking = nroPuesto;
-    }
-
-    public synchronized void solicitarAtencion(String pasajero) {
-        try {
-            while (!puestoCheckingLibre) {
-                wait();
-            }
-        } catch (InterruptedException ex) {
-            Logger.getLogger(GestorChecking.class.getName()).log(Level.SEVERE, null, ex);
+    public GestorChecking(int cantPuestos) {
+        this.cantPuestosChecking = cantPuestos;
+        colaPuestos = new ColaChecking[cantPuestosChecking];
+        gestorChecking = new PuestoChecking[cantPuestosChecking];
+        for (int i = 0; i < cantPuestosChecking; i++) {
+            colaPuestos[i] = new ColaChecking();
+            gestorChecking[i] = new PuestoChecking(i);
         }
-        //System.out.println("El " + pasajero + " esta haciendo el checking en el puesto " + nroPuestoChecking);
-        puestoCheckingLibre = false;
     }
 
-    public synchronized char liberarPuestoChecking() {
-        Random random = new Random();
-        char terminal = (char) (random.nextInt(3) + 'A');
-        System.out.println(Thread.currentThread().getName() + " se asigno la Terminal  " + terminal);
-        puestoCheckingLibre = false;
-        notify();
+    public void hacerColaChecking(Pasajero pasajero, int puestoChecking) {
+        colaPuestos[puestoChecking].hacerCola(pasajero);
+        System.out.println("El " + pasajero.nombre() + " esta haciendo cola en el puesto de Checking " + puestoChecking);
+    }
+
+    public void solicitarChecking(int puestoChecking) {
+        String nombre = colaPuestos[puestoChecking].sacarCola();
+        gestorChecking[puestoChecking].solicitarAtencion(nombre);
+        System.out.println("El " + nombre + " esta haciendo el Checking en el puesto " + puestoChecking);
+    }
+
+    public char hacerChecking(int puestoChecking) {
+        char terminal;
+        terminal = gestorChecking[puestoChecking].liberarPuestoChecking();
+        System.out.println("El  puesto de checking " + puestoChecking + " se libero ");
         return terminal;
     }
-
 }

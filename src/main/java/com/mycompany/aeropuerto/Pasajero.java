@@ -4,6 +4,8 @@
  */
 package com.mycompany.aeropuerto;
 
+import java.util.Random;
+
 /**
  *
  * @author Academica
@@ -11,17 +13,19 @@ package com.mycompany.aeropuerto;
 public class Pasajero implements Runnable {
 
     GestorInformes informes;
-    GestorColaEspera colaEspera;
+    GestorChecking colaEspera;
     GestorTransporte gestorTransporte;
+    GestorSalasEmbarque gestorSalaEmbarque;
     char terminal;
 
     int puestoChecking;
     boolean avanza = false;
 
-    public Pasajero(GestorInformes informes, GestorColaEspera colaEspera, GestorTransporte gestorT) {
+    public Pasajero(GestorInformes informes, GestorChecking colaEspera, GestorTransporte gestorT, GestorSalasEmbarque gSE) {
         this.informes = informes;
         this.colaEspera = colaEspera;
         this.gestorTransporte = gestorT;
+        gestorSalaEmbarque = gSE;
     }
 
     public String nombre() {
@@ -38,14 +42,22 @@ public class Pasajero implements Runnable {
 
     @Override
     public void run() {
-        System.out.println("El pasajero " + Thread.currentThread().getName() + " llega al Aeropuerto");
+        System.out.println("El " + Thread.currentThread().getName() + " llega al Aeropuerto");
         informes.solicitarAtencionInformes();
         puestoChecking = informes.consultarPuestoChecking();
         System.out.println("El pasajero " + Thread.currentThread().getName() + " tiene que ir al puesto de Checking " + puestoChecking);
         colaEspera.hacerColaChecking(this, puestoChecking); //inserta al pasajero en la cola del puesto de Checking
+        colaEspera.solicitarChecking(puestoChecking);
         terminal = colaEspera.hacerChecking(puestoChecking);
-        System.out.println("El pasajero " + Thread.currentThread().getName() + " hizo el Checking en el puesto " + puestoChecking + " tiene que ir a la Terminal " + terminal);
+        System.out.println("El " + Thread.currentThread().getName() + " hizo el Checking en el puesto " + puestoChecking + " tiene que ir a la Terminal " + terminal);
         gestorTransporte.subirTren(terminal);
         gestorTransporte.bajarTren(terminal);
+        Random irFreeShop = new Random();
+        if (irFreeShop.nextBoolean()) {
+            gestorSalaEmbarque.irFreeShop(terminal);
+            gestorSalaEmbarque.salirFreeShop(terminal);
+        } else  System.out.println("El " + Thread.currentThread().getName() + " no va al FreeShop y se queda en la sala de embarque de la terminal  " + terminal);
+        gestorSalaEmbarque.esperarEmbarque(terminal);
+        gestorSalaEmbarque.embarcar(terminal);
     }
 }

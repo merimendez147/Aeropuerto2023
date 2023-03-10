@@ -14,37 +14,35 @@ import java.util.logging.Logger;
  *
  * @author Academica
  */
-public class ColaEspera {
+public class ColaChecking {
     int max = 20;
     ArrayBlockingQueue<Pasajero> colaEspera;
-    ArrayBlockingQueue<Semaphore> turno;
     
-    public ColaEspera(){
+    public ColaChecking(){
          colaEspera = new ArrayBlockingQueue<>(max);
-         turno = new ArrayBlockingQueue<>(max);
     }
     
     public void hacerCola(Pasajero pasajero){
-        Semaphore semTurno= new Semaphore(0);
         try {
             colaEspera.put(pasajero);
-            turno.put(semTurno);
-            
+            System.out.println("El " + pasajero.nombre() + " esta en cola ");
         } catch (InterruptedException ex) {
-            Logger.getLogger(ColaEspera.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ColaChecking.class.getName()).log(Level.SEVERE, null, ex);
         }
+         
     }
     
     public boolean colaVacia(){
         return colaEspera.isEmpty();
     }
     
-    public String salirCola(){
+    public String sacarCola(){
         Pasajero pasajero = null;
         try {
             pasajero = colaEspera.take();
+             System.out.println("El " + pasajero.nombre() + " salio de la cola ");
         } catch (InterruptedException ex) {
-            Logger.getLogger(ColaEspera.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ColaChecking.class.getName()).log(Level.SEVERE, null, ex);
         }
         return pasajero.nombre();
     }
