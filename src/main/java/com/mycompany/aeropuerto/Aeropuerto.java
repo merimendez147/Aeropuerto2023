@@ -24,9 +24,6 @@ public class Aeropuerto {
         atencionInformes.setName("Atencion Informes");
         atencionInformes.start();
         
-        Thread transporte = new Thread(new Transporte(gestorTransporte, capacidadTren,cantPasajeros));
-        transporte.setName("TransporteTerminal");
-        transporte.start();
 
         Thread[] pasajeros = new Thread[cantPasajeros];
         for (int j = 0; j < cantPasajeros; j++) {
