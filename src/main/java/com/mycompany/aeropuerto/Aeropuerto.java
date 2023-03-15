@@ -11,20 +11,19 @@ package com.mycompany.aeropuerto;
 public class Aeropuerto {
 
     public static void main(String[] args) {
+
         int cantPasajeros = 10;
         int cantPuestosChecking = 4;
-        int catidadTerminales = 3;
+        int cantidadTerminales = 3;
         int capacidadTren = 5;
         GestorInformes informes = new GestorInformes(cantPuestosChecking, cantPasajeros);
         GestorChecking colaEspera = new GestorChecking(cantPuestosChecking);
         GestorTransporte gestorTransporte = new GestorTransporte(capacidadTren);
-        GestorSalasEmbarque gestorSalaEmbarque = new GestorSalasEmbarque(catidadTerminales);
-
+        GestorSalasEmbarque gestorSalaEmbarque = new GestorSalasEmbarque(cantidadTerminales);
         Thread atencionInformes = new Thread(new AtencionInformes(informes));
         atencionInformes.setName("Atencion Informes");
         atencionInformes.start();
-        
-
+    
         Thread[] pasajeros = new Thread[cantPasajeros];
         for (int j = 0; j < cantPasajeros; j++) {
             pasajeros[j] = new Thread(new Pasajero(informes, colaEspera, gestorTransporte, gestorSalaEmbarque));

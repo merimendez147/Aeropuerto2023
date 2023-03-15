@@ -11,26 +11,26 @@ package com.mycompany.aeropuerto;
 public class GestorChecking {
 
     int cantPuestosChecking;
-    ColaChecking[] colaPuestos;
+    ColaChecking[] colaPuestoChecking;
     PuestoChecking[] gestorChecking;
 
     public GestorChecking(int cantPuestos) {
         this.cantPuestosChecking = cantPuestos;
-        colaPuestos = new ColaChecking[cantPuestosChecking];
+        colaPuestoChecking = new ColaChecking[cantPuestosChecking];
         gestorChecking = new PuestoChecking[cantPuestosChecking];
         for (int i = 0; i < cantPuestosChecking; i++) {
-            colaPuestos[i] = new ColaChecking();
+            colaPuestoChecking[i] = new ColaChecking();
             gestorChecking[i] = new PuestoChecking(i);
         }
     }
 
     public void hacerColaChecking(Pasajero pasajero, int puestoChecking) {
-        colaPuestos[puestoChecking].hacerCola(pasajero);
+        colaPuestoChecking[puestoChecking].hacerCola(pasajero);
         System.out.println("El " + pasajero.nombre() + " esta haciendo cola en el puesto de Checking " + puestoChecking);
     }
 
     public void solicitarChecking(int puestoChecking) {
-        String nombre = colaPuestos[puestoChecking].sacarCola();
+        String nombre = colaPuestoChecking[puestoChecking].sacarCola();
         gestorChecking[puestoChecking].solicitarAtencion(nombre);
         System.out.println("El " + nombre + " esta haciendo el Checking en el puesto " + puestoChecking);
     }

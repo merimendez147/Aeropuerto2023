@@ -15,7 +15,7 @@ import java.util.logging.Logger;
 public class PuestoChecking {
 
     private Boolean puestoCheckingLibre = true;
-    private final int nroPuestoChecking;
+    int nroPuestoChecking;
 
     public PuestoChecking(int nroPuesto) {
         this.nroPuestoChecking = nroPuesto;
@@ -36,10 +36,9 @@ public class PuestoChecking {
     public synchronized char liberarPuestoChecking() {
         Random random = new Random();
         char terminal = (char) (random.nextInt(3) + 'A');
-        System.out.println(Thread.currentThread().getName() + " se asigno la Terminal  " + terminal);
+        System.out.println("El puesto de Checking "+nroPuestoChecking+ " asigno al "+Thread.currentThread().getName() + " la Terminal  " + terminal);
         puestoCheckingLibre = true;
         notify();
         return terminal;
     }
-
 }

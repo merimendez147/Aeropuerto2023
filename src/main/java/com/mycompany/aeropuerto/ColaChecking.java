@@ -1,7 +1,6 @@
 package com.mycompany.aeropuerto;
 
 import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.Semaphore;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
