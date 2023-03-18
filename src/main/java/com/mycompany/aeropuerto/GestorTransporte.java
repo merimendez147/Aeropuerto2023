@@ -16,14 +16,15 @@ import java.util.logging.Logger;
  */
 public class GestorTransporte {
 
-   Semaphore semTrenParado, mutexContador;
-    CyclicBarrier inicioTrayecto;
+    Semaphore semTrenParado, mutexContador;
+    CyclicBarrier inicioTrayecto, finTrayecto;
     int capacidadTren, terminalA, terminalB, terminalC;
     private final Semaphore[] turnoBajarTren = new Semaphore[3];
 
     public GestorTransporte(int capacidadT) {
         this.capacidadTren = capacidadT;
         inicioTrayecto = new CyclicBarrier(capacidadTren);
+        finTrayecto = new CyclicBarrier(capacidadTren);
         semTrenParado = new Semaphore(capacidadTren);
         mutexContador = new Semaphore(1);
         terminalA = 0;
@@ -60,6 +61,7 @@ public class GestorTransporte {
             if (trenCompleto == 0) {
                 System.out.println("------------------------El tren sale completo---------------------------");
                 asignarPrimerTurno();
+                inicioTrayecto.reset();
             }
         } catch (InterruptedException | BrokenBarrierException ex) {
             Logger.getLogger(GestorTransporte.class.getName()).log(Level.SEVERE, null, ex);
@@ -95,13 +97,14 @@ public class GestorTransporte {
         }
         int trenCompleto = 0;
         try {
-            trenCompleto = inicioTrayecto.await();
+            trenCompleto = finTrayecto.await();
         } catch (InterruptedException | BrokenBarrierException ex) {
             Logger.getLogger(GestorTransporte.class.getName()).log(Level.SEVERE, null, ex);
         }
         if (trenCompleto == 0) {
             System.out.println("------------------------El tren vuelve vacio---------------------------");
             semTrenParado.release(capacidadTren);
+            finTrayecto.reset();
         }
     }
 
@@ -181,20 +184,20 @@ public class GestorTransporte {
 
     private boolean ultimoPasajero(char terminal) {
         boolean ultimo = false;
-         try {
+        try {
             mutexContador.acquire();
         } catch (InterruptedException ex) {
             Logger.getLogger(GestorTransporte.class.getName()).log(Level.SEVERE, null, ex);
         }
         switch (terminal) {
             case 'A' -> {
-                ultimo=terminalA==0;
+                ultimo = terminalA == 0;
             }
             case 'B' -> {
-                 ultimo=terminalB==0;
+                ultimo = terminalB == 0;
             }
             case 'C' -> {
-                 ultimo=terminalC==0;
+                ultimo = terminalC == 0;
             }
         }
         mutexContador.release();

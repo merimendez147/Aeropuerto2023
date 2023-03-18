@@ -17,7 +17,7 @@ public class Aeropuerto {
         int cantidadTerminales = 3;
         int capacidadTren = 5;
         GestorInformes informes = new GestorInformes(cantPuestosChecking, cantPasajeros);
-        GestorChecking colaEspera = new GestorChecking(cantPuestosChecking);
+        GestorCheckin colaEspera = new GestorCheckin(cantPuestosChecking);
         GestorTransporte gestorTransporte = new GestorTransporte(capacidadTren);
         GestorSalasEmbarque gestorSalaEmbarque = new GestorSalasEmbarque(cantidadTerminales);
         Thread atencionInformes = new Thread(new AtencionInformes(informes));
