@@ -12,20 +12,20 @@ public class Aeropuerto {
 
     public static void main(String[] args) {
 
-        int cantPasajeros = 10;
-        int cantPuestosChecking = 4;
-        int cantidadTerminales = 3;
-        int capacidadTren = 5;
-        GestorInformes informes = new GestorInformes(cantPuestosChecking, cantPasajeros);
-        GestorCheckin colaEspera = new GestorCheckin(cantPuestosChecking);
-        GestorTransporte gestorTransporte = new GestorTransporte(capacidadTren);
-        GestorSalasEmbarque gestorSalaEmbarque = new GestorSalasEmbarque(cantidadTerminales);
+        int NUM_PASAJEROS = 10;
+        int CAPACIDAD_PEOPLEMOVER = 5;
+        Reserva reserva= new Reserva();
+        GestorInformes informes = new GestorInformes(NUM_PUESTOSCHECKING, NUM_PASAJEROS);
+        GestorCheckin colaEspera = new GestorCheckin(NUM_PUESTOSCHECKING);
+        GestorTransporte gestorTransporte = new GestorTransporte(CAPACIDAD_PEOPLEMOVER);
+        GestorSalasEmbarque gestorSalaEmbarque = new GestorSalasEmbarque(NUM_TERMINALES);
         Thread atencionInformes = new Thread(new AtencionInformes(informes));
         atencionInformes.setName("Atencion Informes");
         atencionInformes.start();
     
-        Thread[] pasajeros = new Thread[cantPasajeros];
-        for (int j = 0; j < cantPasajeros; j++) {
+        Thread[] pasajeros = new Thread[NUM_PASAJEROS];
+        for (int j = 0; j < NUM_PASAJEROS; j++) {
+            reserva.hacerReserva();
             pasajeros[j] = new Thread(new Pasajero(informes, colaEspera, gestorTransporte, gestorSalaEmbarque));
             pasajeros[j].setName("Pasajero" + (j + 1));
             pasajeros[j].start();
