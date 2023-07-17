@@ -4,53 +4,62 @@
  */
 package com.mycompany.aeropuerto;
 
+
 /**
  *
- * @author Academica
+ * @author Maria Mendez
+ * Legajo 61921
+ * Profesorado en Informatica
  */
 public class GestorCheckin {
 
-    int cantPuestosChecking;
-    PuestoCheckin[] puestoChecking;
-    //GuardiaPuestoCheckin[] guardiaPuestoCheckin;
+    int cantPuestosCheckin;
+    PuestoCheckin[] puestoCheckin;
+    Thread[] guardiaPuestoCheckin ;
+    Thread[] atencionCheckin;
+
 
     public GestorCheckin(int cantPuestos) {
-        this.cantPuestosChecking = cantPuestos;
-        puestoChecking = new PuestoCheckin[cantPuestosChecking];
-        Thread[] guardiaPuestoCheckin = new Thread[cantPuestosChecking];
-        Thread[] atencionCheckin = new Thread[cantPuestosChecking];
-//        guardiaPuestoCheckin = new GuardiaPuestoCheckin[cantPuestosChecking];
-        for (int i = 0; i < cantPuestosChecking; i++) {
-            puestoChecking[i] = new PuestoCheckin();
-            guardiaPuestoCheckin[i] = new Thread(new GuardiaPuestoCheckin(puestoChecking[i] ));
+        this.cantPuestosCheckin = cantPuestos;
+        puestoCheckin = new PuestoCheckin[cantPuestosCheckin];
+        guardiaPuestoCheckin = new Thread[cantPuestosCheckin];
+        atencionCheckin = new Thread[cantPuestosCheckin];
+        for (int i = 0; i < cantPuestosCheckin; i++) {
+            puestoCheckin[i] = new PuestoCheckin();
+        }
+    }
+    
+    public void iniciarAtencion(){
+         for (int i = 0; i < cantPuestosCheckin; i++) {
+            guardiaPuestoCheckin[i] = new Thread(new GuardiaPuestoCheckin(puestoCheckin[i] ));
             guardiaPuestoCheckin[i].setName("GuardiaPuestoCheckin"+i);
             guardiaPuestoCheckin[i].start();
-            atencionCheckin[i] = new Thread(new AtencionCheckin(puestoChecking[i] ));
+            atencionCheckin[i] = new Thread(new AtencionCheckin(puestoCheckin[i] ));
             atencionCheckin[i].setName("AtencionPuestoCheckin"+i);
             atencionCheckin[i].start();
         }
     }
     
     
-public void hacerColaChecking(int puestoChecking) {
-        this.puestoChecking[puestoChecking].hacerColaCheckin();
-        System.out.println("El " + Thread.currentThread().getName() + " esta haciendo cola en el puesto de Checking " + puestoChecking);
+public void hacerColaChecking(int puestoCheckin) {
+        this.puestoCheckin[puestoCheckin].hacerColaCheckin();
+        System.out.println("El " + Thread.currentThread().getName() + " esta haciendo cola en el puesto de Checkin " + puestoCheckin);
     }
 
-    public void pasarPuestoCheckin(int puestoChecking) {
-        this.puestoChecking[puestoChecking].pasarPuestoCheckin();
-        System.out.println("El " + Thread.currentThread().getName() + " avisa que quiere pasar a hacer Checking en el puesto " + puestoChecking);
+    public void pasarPuestoCheckin(int puestoCheckin) {
+        this.puestoCheckin[puestoCheckin].pasarPuestoCheckin();
+        System.out.println("El " + Thread.currentThread().getName() + " pasa a hacer Checkin en el puesto " + puestoCheckin);
     }
 
-    public char hacerChecking(int puestoChecking) {
-        char terminal = this.puestoChecking[puestoChecking].hacerCheckin();
-        System.out.println("El " + Thread.currentThread().getName() + " hizo el Checking en el puesto " + puestoChecking);
+    public char hacerChecking(int puestoCheckin, Reserva reserva) {
+        char terminal = this.puestoCheckin[puestoCheckin].hacerCheckin(reserva);
+        System.out.println("El " + Thread.currentThread().getName() + " hizo el Checkin en el puesto " + puestoCheckin);
         return terminal;
     }
 
-    public void liberarPuestoCheckin(int puestoChecking) {
-        this.puestoChecking[puestoChecking].liberarPuestoCheckin();
-        System.out.println( Thread.currentThread().getName() +" libero el puesto de checkin " + puestoChecking);
+    public void liberarPuestoCheckin(int puestoCheckin) {
+        this.puestoCheckin[puestoCheckin].liberarPuestoCheckin();
+        System.out.println( Thread.currentThread().getName() +" libero el puesto de checkin " + puestoCheckin);
         
     }
 }

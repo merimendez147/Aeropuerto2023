@@ -9,7 +9,9 @@ import java.util.logging.Logger;
 
 /**
  *
- * @author Academica
+ * @author Maria Mendez
+ * Legajo 61921
+ * Profesorado en Informatica
  */
 public class AtencionCheckin implements Runnable{
 
@@ -19,23 +21,13 @@ public class AtencionCheckin implements Runnable{
         this.puestoCheckin = puestoCheckin;
     }
 
-    public void hacerCheckin() {
-        int tiempoCheckin = (int) (Math.random() * 3) + 7;// entre 7 y 9 segundos
-        System.out.println(Thread.currentThread().getName() + " esta atendiendo a un pasajero");
-        try {
-            Thread.sleep(tiempoCheckin * 1000);
-        } catch (InterruptedException ex) {
-            Logger.getLogger(AtencionCheckin.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
 
     @Override
     public void run() {
         while (true) {
             System.out.println(Thread.currentThread().getName() + " espera a un pasajero");
             puestoCheckin.esperarAtenderPasajero();
-            this.hacerCheckin();
-            puestoCheckin.terminarCheckin();
+            puestoCheckin.hacerCheckin();
         }
     }
 }

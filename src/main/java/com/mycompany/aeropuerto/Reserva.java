@@ -4,37 +4,27 @@
  */
 package com.mycompany.aeropuerto;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-
 /**
  *
  * @author Academica
  */
 public class Reserva {
 
-    int NUM_AEROLINEAS, NUM_PUESTOSCHECKING, NUM_TERMINALES = 3;
     String aerolinea;
     char terminal;
-    int puestoChecking;
+    int puestoCheckin;
 
-    public void hacerReserva() {
-        List<String> aerolineas = new ArrayList<>();
-        aerolineas.add("Aerolíneas Argentinas");
-        aerolineas.add("LAN");
-        aerolineas.add("American Airlines");
-        int indice = new Random().nextInt(NUM_AEROLINEAS);
-        aerolinea = aerolineas.get(indice);
-        switch (indice) {
+    public Reserva(int numero, String aerolinea) {
+        this.aerolinea = aerolinea;
+        switch (numero) {
+            case 0 ->
+                this.terminal = 'A';
             case 1 ->
-                terminal = 'A';
+                this.terminal = 'B';
             case 2 ->
-                terminal = 'B';
-            case 3 ->
-                terminal = 'C';
+                this.terminal = 'C';
         }
-        puestoChecking = indice;
+        this.puestoCheckin = numero;
     }
 
     public String aerolinea() {
@@ -46,6 +36,6 @@ public class Reserva {
     }
 
     public int puestoChecking() {
-        return this.puestoChecking;
+        return this.puestoCheckin;
     }
 }

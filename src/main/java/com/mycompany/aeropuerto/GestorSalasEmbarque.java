@@ -8,32 +8,48 @@ import java.util.Random;
 
 /**
  *
- * @author Academica
+ * @author Maria Mendez
+ * Legajo 61921
+ * Profesorado en Informatica
  */
 public class GestorSalasEmbarque {
 
     GestorFreeShop[] gestorFreeShop;
-    GestorEmbarque[] gestorEmbarque;
+    Thread[] cajero1;
+    Thread[] cajero2;
     int cantTerminales;
+    Vuelos vuelos;
 
-   public GestorSalasEmbarque(int cantT) {
-    this.cantTerminales = cantT;
-    gestorFreeShop = new GestorFreeShop[cantTerminales];
-    gestorEmbarque = new GestorEmbarque[cantTerminales];
-    char terminal = 65;
-    for (int i = 0; i < cantTerminales; i++) {
-        gestorFreeShop[i] = new GestorFreeShop();
-        Thread cajero1 = new Thread(new Cajero(gestorFreeShop[i], terminal, 1));
-        cajero1.setName("Cajero1"+terminal);
-        cajero1.start();
-        Thread cajero2 = new Thread(new Cajero(gestorFreeShop[i], terminal, 2));
-        cajero2.setName("Cajero2"+terminal);
-        cajero2.start();
-        gestorEmbarque[i] = new GestorEmbarque(terminal);
-        terminal++;
+    public GestorSalasEmbarque(Vuelos vuelos) {
+        this.vuelos= vuelos;
+        this.cantTerminales = vuelos.cantidadAerolineas;
+        gestorFreeShop = new GestorFreeShop[cantTerminales];
+        cajero1 = new Thread[cantTerminales];
+        cajero2 = new Thread[cantTerminales];
     }
-}
 
+    public void iniciarAtencion() {
+        char terminal = 65;
+        for (int i = 0; i < cantTerminales; i++) {
+            gestorFreeShop[i] = new GestorFreeShop();
+            cajero1[i] = new Thread(new Cajero(gestorFreeShop[i], terminal, 1));
+            cajero1[i].setName("Cajero1 de la terminal " + terminal);
+            cajero1[i].start();
+            cajero2[i] = new Thread(new Cajero(gestorFreeShop[i], terminal, 2));
+            cajero2[i].setName("Cajero2 de la terminal " + terminal);
+            cajero2[i].start();
+            terminal++;
+        }
+    }
+
+        public String aerolinea(int indice){
+        return vuelos.aerolinea(indice);
+    } 
+        
+    public boolean vueloEmbarcando(int indice){
+        return vuelos.embarcando(indice);
+    }
+    
     public void ingresarFreeShop(char terminal) {
         switch (terminal) {
             case 'A' -> {
@@ -54,12 +70,12 @@ public class GestorSalasEmbarque {
     public void salirFreeShop(char terminal) {
         switch (terminal) {
             case 'A' -> {
-                gestorFreeShop[0].salirFreeShop();              
+                gestorFreeShop[0].salirFreeShop();
             }
             case 'B' -> {
-                gestorFreeShop[1].salirFreeShop();              
+                gestorFreeShop[1].salirFreeShop();
             }
-             case 'C' -> {
+            case 'C' -> {
                 gestorFreeShop[2].salirFreeShop();
             }
         }
@@ -98,13 +114,4 @@ public class GestorSalasEmbarque {
             }
         }
     }
-
-    public void esperarEmbarque(char terminal) {
-
-    }
-
-    public void embarcar(char t) {
-
-    }
-
 }

@@ -6,7 +6,9 @@ package com.mycompany.aeropuerto;
 
 /**
  *
- * @author Academica
+ * @author Maria Mendez
+ * Legajo 61921
+ * Profesorado en Informatica
  */
 public class Aeropuerto {
 
@@ -14,21 +16,22 @@ public class Aeropuerto {
 
         int NUM_PASAJEROS = 10;
         int CAPACIDAD_PEOPLEMOVER = 5;
-        Reserva reserva= new Reserva();
-        GestorInformes informes = new GestorInformes(NUM_PUESTOSCHECKING, NUM_PASAJEROS);
-        GestorCheckin colaEspera = new GestorCheckin(NUM_PUESTOSCHECKING);
+        int NUM_PUESTOS_INFORMES = 1;
+        int NUM_AEROLINEAS = 3;
+        Vuelos vuelos = new Vuelos(NUM_AEROLINEAS);
+        GestorInformes gestorInformes = new GestorInformes(NUM_PUESTOS_INFORMES);
+        GestorCheckin gestorCheckin = new GestorCheckin(NUM_AEROLINEAS);
+        gestorCheckin.iniciarAtencion();
         GestorTransporte gestorTransporte = new GestorTransporte(CAPACIDAD_PEOPLEMOVER);
-        GestorSalasEmbarque gestorSalaEmbarque = new GestorSalasEmbarque(NUM_TERMINALES);
-        Thread atencionInformes = new Thread(new AtencionInformes(informes));
-        atencionInformes.setName("Atencion Informes");
-        atencionInformes.start();
-    
+        GestorSalasEmbarque gestorSalaEmbarque = new GestorSalasEmbarque(vuelos);
+        gestorSalaEmbarque.iniciarAtencion();
         Thread[] pasajeros = new Thread[NUM_PASAJEROS];
         for (int j = 0; j < NUM_PASAJEROS; j++) {
-            reserva.hacerReserva();
-            pasajeros[j] = new Thread(new Pasajero(informes, colaEspera, gestorTransporte, gestorSalaEmbarque));
+            vuelos.hacerReserva();
+            pasajeros[j] = new Thread(new Pasajero(vuelos.reserva(), gestorInformes, gestorCheckin, gestorTransporte, gestorSalaEmbarque));
             pasajeros[j].setName("Pasajero" + (j + 1));
             pasajeros[j].start();
         }
+        vuelos.comenzarEmbarque();
     }
 }

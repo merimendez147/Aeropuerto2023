@@ -6,7 +6,9 @@ package com.mycompany.aeropuerto;
 
 /**
  *
- * @author Academica
+ * @author Maria Mendez
+ * Legajo 61921
+ * Profesorado en Informatica
  */
 public class GuardiaPuestoCheckin implements Runnable {
 

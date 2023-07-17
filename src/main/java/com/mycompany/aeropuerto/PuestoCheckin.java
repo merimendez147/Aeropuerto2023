@@ -1,24 +1,19 @@
 package com.mycompany.aeropuerto;
 
-import java.util.Random;
-import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.Semaphore;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 /**
  *
- * @author Academica
+ * @author Maria Mendez
+ * Legajo 61921
+ * Profesorado en Informatica
  */
 public class PuestoCheckin {
 
-    int capacidadPuestoCheckin = 20;
+    int capacidadPuestoCheckin = 4;
     private final Semaphore semColaCheckin;
-    private final Semaphore semSalida;// lo usaria el cocinero para avisar al mozo que esta la comida 
     private final Semaphore semGuardia;
     private Semaphore semAtencionCheckin;
     private final Semaphore semPuestoCheckin;
@@ -26,12 +21,12 @@ public class PuestoCheckin {
 
     public PuestoCheckin() {
         semColaCheckin = new Semaphore(capacidadPuestoCheckin, true);
-        semSalida = new Semaphore(0, true);
         semPuestoCheckin = new Semaphore(1, true);//el Puesto esta disponible al principio
-        semGuardia = new Semaphore(0, true);
-        semCheckin = new Semaphore(0, true);
-        semAtencionCheckin = new Semaphore(0, true);
+        semGuardia = new Semaphore(0, true);//el Guardia esta esperando a que llegue un pasajero
+        semCheckin = new Semaphore(0, true);//exclusion mutua del puesto de atencion
+        semAtencionCheckin = new Semaphore(0, true);//el Puesto de Atencion esta esperando a que llegue un pasajero
     }
+
 
     public void hacerColaCheckin(){
         try {
@@ -53,7 +48,7 @@ public class PuestoCheckin {
         }
     }
     
-    public void darPasoPasajero(){//guardia da paso al pasajero al puesto de checkin
+    public void darPasoPasajero(){//guardia da paso al pasajero al puesto de checkin y habilita un lugar en la cola de espera
         try {
             semPuestoCheckin.acquire();//si el puesto de checkin esta libre
         } catch (InterruptedException ex) {
@@ -71,22 +66,20 @@ public class PuestoCheckin {
         }
     }
     
-    public char hacerCheckin(){//Pasajero hace checkin
+    public char hacerCheckin(Reserva reserva){//Pasajero hace checkin
         try {
             semCheckin.acquire();
         } catch (InterruptedException ex) {
             Logger.getLogger(PuestoCheckin.class.getName()).log(Level.SEVERE, null, ex);
         }
-        Random random = new Random();
-        char terminal = (char) (random.nextInt(3) + 'A');
-        return terminal;
+        return  reserva.terminal();
     }
     
-    public void terminarCheckin(){//atencionCheckin termina de hacer checkin
+    public void hacerCheckin(){//atencionCheckin  hace el checkin
         semCheckin.release();
     }
     
-    public void liberarPuestoCheckin(){//el pasajero se va
+    public void liberarPuestoCheckin(){//el pasajero libera el puesto de Checkin
         semPuestoCheckin.release();
     }
 }

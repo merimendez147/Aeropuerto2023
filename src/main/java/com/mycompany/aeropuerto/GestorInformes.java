@@ -4,56 +4,43 @@
  */
 package com.mycompany.aeropuerto;
 
-import java.util.concurrent.Semaphore;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
  *
- * @author Academica
+ * @author Maria Mendez
+ * Legajo 61921
+ * Profesorado en Informatica
  */
 public class GestorInformes {
 
-    Semaphore semPasajero = new Semaphore(0);
-    Semaphore semAtencionInformes = new Semaphore(0);
-    // Semaphore mutexAtencion = new Semaphore(1);
-    int cantPuestoChecking;
-    int cantPasajeros;
+    private final int cantidadPuestosInforme;
+    private int atendiendo;
 
-    public GestorInformes(int cantPuestos, int cantPasajeros) {
-        this.cantPasajeros = cantPasajeros;
-        this.cantPuestoChecking = cantPuestos;
-
+    public GestorInformes(int numPuestosInforme) {
+        this.cantidadPuestosInforme = numPuestosInforme;
+        this.atendiendo = 0;
     }
 
-    public int cantidadPasajeros() {
-        return this.cantPasajeros;
-    }
-
-    public void solicitarAtencionInformes() {
-        semAtencionInformes.release();
-    }
-
-    public int consultarPuestoChecking() {
-        int puestoAtencionAerolinea = 0;
-        try {
-            semPasajero.acquire();
-            puestoAtencionAerolinea = (int) (Math.random() * cantPuestoChecking);
-        } catch (InterruptedException ex) {
-            Logger.getLogger(GestorInformes.class.getName()).log(Level.SEVERE, null, ex);
+    public synchronized void solicitarAtencion() {
+        while (atendiendo >= cantidadPuestosInforme) {
+            System.out.println(Thread.currentThread().getName() + " debe esperar a ser atendido en el puesto de informes del aeropuerto");
+            try {
+                this.wait();
+            } catch (InterruptedException ex) {
+                Logger.getLogger(GestorInformes.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
+        System.out.println(Thread.currentThread().getName() + " es atendido en el puesto de informes del aeropuerto");
+        atendiendo++;
+    }
+
+    public synchronized int consultarPuestoChecking(Reserva reserva) {
+        int puestoAtencionAerolinea = reserva.puestoChecking();
+        System.out.println(Thread.currentThread().getName() + " tiene que ir al puesto de checkin " + puestoAtencionAerolinea);
+        atendiendo--;
+        this.notifyAll();
         return puestoAtencionAerolinea;
-    }
-
-    public void esperarPasajero() {
-        try {
-            semAtencionInformes.acquire();
-        } catch (InterruptedException ex) {
-            Logger.getLogger(GestorInformes.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
-
-    public void atenderPasajero() {
-        semPasajero.release();
     }
 }
