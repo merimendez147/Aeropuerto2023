@@ -18,20 +18,29 @@ public class Aeropuerto {
         int CAPACIDAD_PEOPLEMOVER = 5;
         int NUM_PUESTOS_INFORMES = 1;
         int NUM_AEROLINEAS = 3;
-        Vuelos vuelos = new Vuelos(NUM_AEROLINEAS);
+        Vuelos vuelos = new Vuelos(NUM_AEROLINEAS, NUM_PASAJEROS);
+        vuelos.crearReservas();//crea las reservas aleatoriamente para cada pasajero
+        vuelos.comenzarEmbarque();
         GestorInformes gestorInformes = new GestorInformes(NUM_PUESTOS_INFORMES);
         GestorCheckin gestorCheckin = new GestorCheckin(NUM_AEROLINEAS);
-        gestorCheckin.iniciarAtencion();
         GestorTransporte gestorTransporte = new GestorTransporte(CAPACIDAD_PEOPLEMOVER);
         GestorSalasEmbarque gestorSalaEmbarque = new GestorSalasEmbarque(vuelos);
         gestorSalaEmbarque.iniciarAtencion();
+        Thread[] atencionCheckin = new Thread[NUM_AEROLINEAS];
+        for (int i = 0; i < NUM_AEROLINEAS; i++) {
+            atencionCheckin[i] = new Thread(new AtencionCheckin(gestorCheckin, i));
+            atencionCheckin[i].setName("Atencion Puesto" + i);
+            atencionCheckin[i].start();
+        }
         Thread[] pasajeros = new Thread[NUM_PASAJEROS];
         for (int j = 0; j < NUM_PASAJEROS; j++) {
-            vuelos.hacerReserva();
-            pasajeros[j] = new Thread(new Pasajero(vuelos.reserva(), gestorInformes, gestorCheckin, gestorTransporte, gestorSalaEmbarque));
+            Reserva reserva=vuelos.hacerReserva();
+            pasajeros[j] = new Thread(new Pasajero(reserva, gestorInformes, gestorCheckin, gestorTransporte, gestorSalaEmbarque));
             pasajeros[j].setName("Pasajero" + (j + 1));
             pasajeros[j].start();
         }
-        vuelos.comenzarEmbarque();
+        for (int i = 0; i < NUM_AEROLINEAS; i++) {
+            gestorSalaEmbarque.cerrarEmbarque(i);
+        }
     }
 }

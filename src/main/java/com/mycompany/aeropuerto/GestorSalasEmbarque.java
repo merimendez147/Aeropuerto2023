@@ -50,6 +50,14 @@ public class GestorSalasEmbarque {
         return vuelos.embarcando(indice);
     }
     
+   public void cerrarEmbarque(int indice){
+       vuelos.cerrarEmbarque(indice);
+   }
+   
+   public void embarcar(int indice) {
+       vuelos.embarcar(indice);
+   }
+    
     public void ingresarFreeShop(char terminal) {
         switch (terminal) {
             case 'A' -> {

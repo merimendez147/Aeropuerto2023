@@ -13,21 +13,25 @@ import java.util.logging.Logger;
  * Legajo 61921
  * Profesorado en Informatica
  */
-public class AtencionCheckin implements Runnable{
+public class AtencionCheckin implements Runnable {
 
-     PuestoCheckin puestoCheckin;
+        GestorCheckin gestorCheckin;
+        int puestoCheckin;
 
-    public AtencionCheckin(PuestoCheckin puestoCheckin) {
-        this.puestoCheckin = puestoCheckin;
-    }
+        public AtencionCheckin(GestorCheckin gestorCheckin, int puestoCheckin) {
+            this.gestorCheckin = gestorCheckin;
+            this.puestoCheckin = puestoCheckin;
+        }
 
-
-    @Override
-    public void run() {
-        while (true) {
-            System.out.println(Thread.currentThread().getName() + " espera a un pasajero");
-            puestoCheckin.esperarAtenderPasajero();
-            puestoCheckin.hacerCheckin();
+        @Override
+        public void run() {
+            while (true) {
+                try {
+                    Thread.sleep(1000);
+                    gestorCheckin.atenderPuestoCheckin(puestoCheckin);
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(AtencionCheckin.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
         }
     }
-}

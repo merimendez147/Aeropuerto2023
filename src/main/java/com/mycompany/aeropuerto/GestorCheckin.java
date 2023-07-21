@@ -4,62 +4,52 @@
  */
 package com.mycompany.aeropuerto;
 
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
- * @author Maria Mendez
- * Legajo 61921
- * Profesorado en Informatica
+ * @author Maria Mendez Legajo 61921 Profesorado en Informatica
  */
 public class GestorCheckin {
+        int cantPuestos;
+        int capacidadColaCheckin = 2;
+        BlockingQueue<Thread>[] colaCheckin;
 
-    int cantPuestosCheckin;
-    PuestoCheckin[] puestoCheckin;
-    Thread[] guardiaPuestoCheckin ;
-    Thread[] atencionCheckin;
-
-
-    public GestorCheckin(int cantPuestos) {
-        this.cantPuestosCheckin = cantPuestos;
-        puestoCheckin = new PuestoCheckin[cantPuestosCheckin];
-        guardiaPuestoCheckin = new Thread[cantPuestosCheckin];
-        atencionCheckin = new Thread[cantPuestosCheckin];
-        for (int i = 0; i < cantPuestosCheckin; i++) {
-            puestoCheckin[i] = new PuestoCheckin();
+        public GestorCheckin(int cantPuestosCheckin) {
+            this.cantPuestos = cantPuestosCheckin;
+            colaCheckin = new BlockingQueue[cantPuestos];
+            for (int i = 0; i < this.cantPuestos; i++) {
+                colaCheckin[i] = new LinkedBlockingQueue<>(capacidadColaCheckin);
+            }
         }
-    }
-    
-    public void iniciarAtencion(){
-         for (int i = 0; i < cantPuestosCheckin; i++) {
-            guardiaPuestoCheckin[i] = new Thread(new GuardiaPuestoCheckin(puestoCheckin[i] ));
-            guardiaPuestoCheckin[i].setName("GuardiaPuestoCheckin"+i);
-            guardiaPuestoCheckin[i].start();
-            atencionCheckin[i] = new Thread(new AtencionCheckin(puestoCheckin[i] ));
-            atencionCheckin[i].setName("AtencionPuestoCheckin"+i);
-            atencionCheckin[i].start();
+
+        public void hacerChecking(int puestoCheckin) {
+            Thread pasajero = Thread.currentThread();
+            try {
+                colaCheckin[puestoCheckin].put(pasajero);
+            } catch (InterruptedException ex) {
+                Logger.getLogger(GestorCheckin.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            System.out.println("El " + pasajero.getName() + " está haciendo cola en el puesto de Checkin " + puestoCheckin);
+            //synchronized (pasajero) {
+                pasajero.suspend(); // suspender  al pasajero para que continúe en la cola de check-in              
+          //  }
         }
-    }
-    
-    
-public void hacerColaChecking(int puestoCheckin) {
-        this.puestoCheckin[puestoCheckin].hacerColaCheckin();
-        System.out.println("El " + Thread.currentThread().getName() + " esta haciendo cola en el puesto de Checkin " + puestoCheckin);
-    }
 
-    public void pasarPuestoCheckin(int puestoCheckin) {
-        this.puestoCheckin[puestoCheckin].pasarPuestoCheckin();
-        System.out.println("El " + Thread.currentThread().getName() + " pasa a hacer Checkin en el puesto " + puestoCheckin);
-    }
-
-    public char hacerChecking(int puestoCheckin, Reserva reserva) {
-        char terminal = this.puestoCheckin[puestoCheckin].hacerCheckin(reserva);
-        System.out.println("El " + Thread.currentThread().getName() + " hizo el Checkin en el puesto " + puestoCheckin);
-        return terminal;
-    }
-
-    public void liberarPuestoCheckin(int puestoCheckin) {
-        this.puestoCheckin[puestoCheckin].liberarPuestoCheckin();
-        System.out.println( Thread.currentThread().getName() +" libero el puesto de checkin " + puestoCheckin);
-        
-    }
+        public void atenderPuestoCheckin(int puestoCheckin) {
+            Thread pasajero = null;
+            Thread puesto = Thread.currentThread();
+            synchronized (puesto) {
+                try {
+                    pasajero = colaCheckin[puestoCheckin].take(); // El siguiente pasajero en la cola de espera
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(GestorCheckin.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                pasajero.resume(); // reanudar el hilo pasajero
+                //System.out.println("El " + pasajero.getName() + " hizo el Checkin en el puesto " + puestoCheckin);
+            }
+        }
 }

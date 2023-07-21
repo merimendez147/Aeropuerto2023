@@ -36,7 +36,7 @@ public class GestorInformes {
         atendiendo++;
     }
 
-    public synchronized int consultarPuestoChecking(Reserva reserva) {
+    public synchronized int consultarPuesto(Reserva reserva) {
         int puestoAtencionAerolinea = reserva.puestoChecking();
         System.out.println(Thread.currentThread().getName() + " tiene que ir al puesto de checkin " + puestoAtencionAerolinea);
         atendiendo--;
