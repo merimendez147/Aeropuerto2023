@@ -6,21 +6,22 @@ package com.mycompany.aeropuerto;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 /**
  *
- * @author Maria Mendez
- * Legajo 61921
- * Profesorado en Informatica
+ * @author Maria Elisa Mendez Cares
+ * Legajo: 61921
+ * Carrera: Profesorado de Informatica
+ * Email: maria.mendez@est.fi.uncoma.edu.ar
  */
+
 public class AtencionCheckin implements Runnable {
 
         GestorCheckin gestorCheckin;
-        int puestoCheckin;
+        int nroPuesto;
 
         public AtencionCheckin(GestorCheckin gestorCheckin, int puestoCheckin) {
             this.gestorCheckin = gestorCheckin;
-            this.puestoCheckin = puestoCheckin;
+            this.nroPuesto = puestoCheckin;
         }
 
         @Override
@@ -28,7 +29,7 @@ public class AtencionCheckin implements Runnable {
             while (true) {
                 try {
                     Thread.sleep(1000);
-                    gestorCheckin.atenderPuestoCheckin(puestoCheckin);
+                    gestorCheckin.atenderPuestoCheckin(nroPuesto);
                 } catch (InterruptedException ex) {
                     Logger.getLogger(AtencionCheckin.class.getName()).log(Level.SEVERE, null, ex);
                 }

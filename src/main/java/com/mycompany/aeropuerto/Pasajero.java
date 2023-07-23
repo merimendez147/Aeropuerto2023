@@ -5,14 +5,11 @@
 package com.mycompany.aeropuerto;
 
 import java.util.Random;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
- * @author Maria Mendez
- * Legajo 61921
- * Profesorado en Informatica
+ * @author Maria Elisa Mendez Cares Legajo: 61921 Carrera: Profesorado de
+ * Informatica Email: maria.mendez@est.fi.uncoma.edu.ar
  */
 public class Pasajero implements Runnable {
 
@@ -35,11 +32,10 @@ public class Pasajero implements Runnable {
     public String nombre() {
         return Thread.currentThread().getName();
     }
-    
-    public Reserva reserva(){
+
+    public Reserva reserva() {
         return this.reserva;
     }
-    
 
     @Override
     public void run() {
@@ -52,7 +48,9 @@ public class Pasajero implements Runnable {
         gestorTransporte.subirTren(terminal);
         gestorTransporte.bajarTren(terminal);
         Random ingresarFreeShop = new Random();
-        if (ingresarFreeShop.nextBoolean() && !gestorSalaEmbarque.vueloEmbarcando(nroPuesto)) {
+        boolean ingresaFreeShop = ingresarFreeShop.nextBoolean();
+        int nroAerolinea = nroPuesto;
+        if (ingresaFreeShop && !gestorSalaEmbarque.vueloEmbarcando(nroAerolinea)) {
             gestorSalaEmbarque.ingresarFreeShop(terminal);
             System.out.println("El " + Thread.currentThread().getName() + " ingresa al FreeShop  de la terminal  " + terminal);
             Random comprarFreeShop = new Random();
@@ -61,16 +59,16 @@ public class Pasajero implements Runnable {
                 gestorSalaEmbarque.pagarFreeShop(terminal);
             }
             gestorSalaEmbarque.salirFreeShop(terminal);
-            System.out.println(Thread.currentThread().getName() + " salio del Free Shop de la Terminal " + terminal);
+            System.out.println(Thread.currentThread().getName() + " salio del FreeShop de la Terminal " + terminal);
         } else {
-            if (!ingresarFreeShop.nextBoolean()) {
+            if (!ingresaFreeShop) {
                 System.out.println("El " + Thread.currentThread().getName() + " no quiso ingresar al FreeShop");
-            } else if (gestorSalaEmbarque.vueloEmbarcando(nroPuesto)) {
-                System.out.println("El " + Thread.currentThread().getName() + " no pudo ingresar al FreeShop  porque el vuelo de "+gestorSalaEmbarque.aerolinea(nroPuesto)+" esta embarcando");
+            } else if (gestorSalaEmbarque.vueloEmbarcando(nroAerolinea)) {
+                System.out.println("El " + Thread.currentThread().getName() + " no pudo ingresar al FreeShop  porque el vuelo de " + gestorSalaEmbarque.aerolinea(nroPuesto) + " esta embarcando");
             }
         }
         System.out.println("El " + Thread.currentThread().getName() + " proximo a embarcar en la terminal  " + terminal);
-        gestorSalaEmbarque.embarcar(nroPuesto);
+        gestorSalaEmbarque.embarcar(nroAerolinea);
         System.out.println("El " + Thread.currentThread().getName() + " subio al vuelo de la aerolinea  " + gestorSalaEmbarque.aerolinea(nroPuesto));
     }
 }

@@ -7,19 +7,21 @@ package com.mycompany.aeropuerto;
 import java.util.concurrent.Semaphore;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 /**
  *
- * @author Academica
+ * @author Maria Elisa Mendez Cares
+ * Legajo: 61921
+ * Carrera: Profesorado de Informatica
+ * Email: maria.mendez@est.fi.uncoma.edu.ar
  */
 public class GestorFreeShop {
 
     int capacidadFreeShop = 20;
-    Semaphore ingresarFreeShop;
-    Semaphore pagarCaja1;
-    Semaphore esperarCaja1;
-    Semaphore pagarCaja2;
-    Semaphore esperarCaja2;
+    Semaphore ingresarFreeShop;//controla la cantidad de pasajeros que pueden ingresar al FreeShop
+    Semaphore pagarCaja1; //rendevous con esperarCaja1
+    Semaphore esperarCaja1;//rendevous con pagarCaja1
+    Semaphore pagarCaja2;//rendevous con esperarCaja1
+    Semaphore esperarCaja2;//rendevous con pagarCaja1
 
     public GestorFreeShop() {
         ingresarFreeShop = new Semaphore(capacidadFreeShop, true);
@@ -59,7 +61,7 @@ public class GestorFreeShop {
         ingresarFreeShop.release();
     }
 
-    public void cobrarFreeShopCaja1() {
+    public void cobrarCaja1() {
         try {
             esperarCaja1.acquire();
             pagarCaja1.release();
@@ -68,7 +70,7 @@ public class GestorFreeShop {
         }
     }
 
-    public void cobrarFreeShopCaja2() {
+    public void cobrarCaja2() {
         try {
             esperarCaja2.acquire();
             pagarCaja2.release();

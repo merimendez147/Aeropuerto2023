@@ -6,12 +6,12 @@ package com.mycompany.aeropuerto;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 /**
  *
- * @author Maria Mendez
- * Legajo 61921
- * Profesorado en Informatica
+ * @author Maria Elisa Mendez Cares
+ * Legajo: 61921
+ * Carrera: Profesorado de Informatica
+ * Email: maria.mendez@est.fi.uncoma.edu.ar
  */
 public class GestorInformes {
 

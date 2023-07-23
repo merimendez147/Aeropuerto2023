@@ -13,25 +13,27 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Semaphore;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 /**
  *
- * @author Maria Mendez Legajo 61921 Profesorado en Informatica
+ * @author Maria Elisa Mendez Cares
+ * Legajo: 61921
+ * Carrera: Profesorado de Informatica
+ * Email: maria.mendez@est.fi.uncoma.edu.ar
  */
 public class Vuelos {
 
     CountDownLatch[] partidas;
     int[] cantReservasVuelo; //cada vuelo tiene una x cantidad de reservas
     boolean[] embarcando;
-    Semaphore vueloEmbarcando[];
+    Semaphore vueloEmbarcando[]; //los pasajeros esperan este semaforo para embarcar
     int cantidadAerolineas, cantidadPasajeros;
     List<String> aerolineas = new ArrayList<>();
     Reserva reserva;
     Reservas reservas;//pila para las reservas 
     Timer timer = new Timer();
 
-    public Vuelos(int numAerolineas, int cantPasajeros) {
-        this.cantidadAerolineas = numAerolineas;
+    public Vuelos(int cantAerolineas, int cantPasajeros) {
+        this.cantidadAerolineas = cantAerolineas;
         this.cantidadPasajeros = cantPasajeros;
         this.partidas = new CountDownLatch[cantidadAerolineas];
         this.cantReservasVuelo = new int[cantidadAerolineas];
@@ -48,16 +50,16 @@ public class Vuelos {
         }
     }
 
-    public String aerolinea(int indice) {
-        return aerolineas.get(indice);
+    public String aerolinea(int nroAerolinea) {
+        return aerolineas.get(nroAerolinea);
     }
 
     public int cantAerolineas() {
         return this.cantidadAerolineas;
     }
 
-    public boolean embarcando(int indice) {
-        return embarcando[indice];
+    public boolean embarcando(int nroAerolinea) {
+        return embarcando[nroAerolinea];
     }
 
     public Reserva reserva() {
@@ -66,10 +68,10 @@ public class Vuelos {
 
     public void crearReservas() {
         for (int i = 1; i <= cantidadPasajeros; i++) {
-            int indice = new Random().nextInt(cantidadAerolineas);
-            reserva = new Reserva(indice, aerolineas.get(indice));
+            int nroAerolinea = new Random().nextInt(cantidadAerolineas);
+            reserva = new Reserva(nroAerolinea, aerolineas.get(nroAerolinea));
             reservas.push(reserva);
-            cantReservasVuelo[indice]++;
+            cantReservasVuelo[nroAerolinea]++;
         }
     }
 
@@ -116,11 +118,11 @@ public class Vuelos {
         timer.schedule(vuelo3, 30000);
     }
 
-    public void embarcar(int aerolinea) { //el pasajero esta en la sala de embarque
-        CountDownLatch partida = partidas[aerolinea];
+    public void embarcar(int nroAerolinea) { //el pasajero esta en la sala de embarque
+        CountDownLatch partida = partidas[nroAerolinea];
         synchronized (partida) {
             try {
-                vueloEmbarcando[aerolinea].acquire();
+                vueloEmbarcando[nroAerolinea].acquire();
             } catch (InterruptedException ex) {
                 Logger.getLogger(Vuelos.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -128,13 +130,13 @@ public class Vuelos {
         }
     }
 
-    public void cerrarEmbarque(int aerolinea) {//gestorSalaEmbarque cierra el embarque
+    public void cerrarEmbarque(int nroAerolinea) {//gestorSalaEmbarque cierra el embarque
         try {
-            partidas[aerolinea].await();
+            partidas[nroAerolinea].await();
         } catch (InterruptedException ex) {
             Logger.getLogger(Vuelos.class.getName()).log(Level.SEVERE, null, ex);
         }
-        System.out.println("El vuelo de " + aerolinea(aerolinea) + " termino de embarcar ");
+        System.out.println("El vuelo de " + aerolinea(nroAerolinea) + " termino de embarcar ");
     }
 
 }

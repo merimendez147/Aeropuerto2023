@@ -3,10 +3,12 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package com.mycompany.aeropuerto;
-
 /**
  *
- * @author Academica
+ * @author Maria Elisa Mendez Cares
+ * Legajo: 61921
+ * Carrera: Profesorado de Informatica
+ * Email: maria.mendez@est.fi.uncoma.edu.ar
  */
 public class Reservas {
 

@@ -5,13 +5,14 @@
 package com.mycompany.aeropuerto;
 
 import java.util.Random;
-
 /**
  *
- * @author Maria Mendez
- * Legajo 61921
- * Profesorado en Informatica
+ * @author Maria Elisa Mendez Cares
+ * Legajo: 61921
+ * Carrera: Profesorado de Informatica
+ * Email: maria.mendez@est.fi.uncoma.edu.ar
  */
+
 public class GestorSalasEmbarque {
 
     GestorFreeShop[] gestorFreeShop;
@@ -42,20 +43,20 @@ public class GestorSalasEmbarque {
         }
     }
 
-        public String aerolinea(int indice){
-        return vuelos.aerolinea(indice);
+        public String aerolinea(int nroAerolinea){
+        return vuelos.aerolinea(nroAerolinea);
     } 
         
-    public boolean vueloEmbarcando(int indice){
-        return vuelos.embarcando(indice);
+    public boolean vueloEmbarcando(int nroAerolinea){
+        return vuelos.embarcando(nroAerolinea);
     }
     
-   public void cerrarEmbarque(int indice){
-       vuelos.cerrarEmbarque(indice);
+   public void cerrarEmbarque(int nroAerolinea){
+       vuelos.cerrarEmbarque(nroAerolinea);
    }
    
-   public void embarcar(int indice) {
-       vuelos.embarcar(indice);
+   public void embarcar(int nroAerolinea) {
+       vuelos.embarcar(nroAerolinea);
    }
     
     public void ingresarFreeShop(char terminal) {
