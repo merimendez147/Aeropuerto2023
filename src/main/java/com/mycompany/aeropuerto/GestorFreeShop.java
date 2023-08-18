@@ -7,28 +7,28 @@ package com.mycompany.aeropuerto;
 import java.util.concurrent.Semaphore;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 /**
  *
- * @author Maria Elisa Mendez Cares
- * Legajo: 61921
- * Carrera: Profesorado de Informatica
- * Email: maria.mendez@est.fi.uncoma.edu.ar
+ * @author Maria Elisa Mendez Cares Legajo: 61921 Carrera: Profesorado de
+ * Informatica Email: maria.mendez@est.fi.uncoma.edu.ar
  */
 public class GestorFreeShop {
-
+    
     int capacidadFreeShop = 20;
     Semaphore ingresarFreeShop;//controla la cantidad de pasajeros que pueden ingresar al FreeShop
-    Semaphore pagarCaja1; //rendevous con esperarCaja1
-    Semaphore esperarCaja1;//rendevous con pagarCaja1
-    Semaphore pagarCaja2;//rendevous con esperarCaja1
-    Semaphore esperarCaja2;//rendevous con pagarCaja1
+    Semaphore pagarCaja[]; //rendevous con esperarCaja
+    Semaphore esperarCaja[];//rendevous con pagarCaja
+    int cantCajas = 2;
 
     public GestorFreeShop() {
         ingresarFreeShop = new Semaphore(capacidadFreeShop, true);
-        pagarCaja1 = new Semaphore(1, true);
-        esperarCaja1 = new Semaphore(0, true);
-        pagarCaja2 = new Semaphore(1, true);
-        esperarCaja2 = new Semaphore(0, true);
+        pagarCaja = new Semaphore[cantCajas];
+        esperarCaja = new Semaphore[cantCajas];
+        for (int i = 0; i < cantCajas; i++) {
+            pagarCaja[i] = new Semaphore(1, true);
+            esperarCaja[i] = new Semaphore(0, true);
+        }
     }
 
     public void ingresarFreeShop() {
@@ -39,43 +39,36 @@ public class GestorFreeShop {
         }
     }
 
-    public void pagarCaja1() {
-        try {
-            pagarCaja1.acquire();
-        } catch (InterruptedException ex) {
-            Logger.getLogger(GestorFreeShop.class.getName()).log(Level.SEVERE, null, ex);
+    public int cajaLibre() {
+        if (pagarCaja[0].tryAcquire()) {
+            return 0;
+        } else {
+            return 1;
         }
-        esperarCaja1.release();
     }
 
-    public void pagarCaja2() {
+    public void pagarCaja(int nroCaja) {
         try {
-            pagarCaja2.acquire();
+            pagarCaja[nroCaja].acquire();
         } catch (InterruptedException ex) {
             Logger.getLogger(GestorFreeShop.class.getName()).log(Level.SEVERE, null, ex);
         }
-        esperarCaja2.release();
+        esperarCaja[nroCaja].release();
     }
 
     public void salirFreeShop() {
         ingresarFreeShop.release();
     }
 
-    public void cobrarCaja1() {
+    public void esperarCliente(int nroCaja) {
         try {
-            esperarCaja1.acquire();
-            pagarCaja1.release();
+            esperarCaja[nroCaja].acquire();
         } catch (InterruptedException e) {
             System.out.println(e);
         }
     }
 
-    public void cobrarCaja2() {
-        try {
-            esperarCaja2.acquire();
-            pagarCaja2.release();
-        } catch (InterruptedException e) {
-            System.out.println(e);
-        }
+    public void cobrarCaja(int nroCaja) {
+        pagarCaja[nroCaja].release();
     }
 }

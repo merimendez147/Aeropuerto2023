@@ -6,53 +6,56 @@ package com.mycompany.aeropuerto;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.Semaphore;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 /**
  *
- * @author Maria Elisa Mendez Cares
- * Legajo: 61921
- * Carrera: Profesorado de Informatica
- * Email: maria.mendez@est.fi.uncoma.edu.ar
+ * @author Maria Elisa Mendez Cares Legajo: 61921 Carrera: Profesorado de
+ * Informatica Email: maria.mendez@est.fi.uncoma.edu.ar
  */
-
 public class GestorCheckin {
-        int cantPuestos;
-        int capacidadColaCheckin = 2;
-        BlockingQueue<Thread>[] colaCheckin;
 
-        public GestorCheckin(int cantPuestosCheckin) {
-            this.cantPuestos = cantPuestosCheckin;
-            colaCheckin = new BlockingQueue[cantPuestos];
-            for (int i = 0; i < this.cantPuestos; i++) {
-                colaCheckin[i] = new LinkedBlockingQueue<>(capacidadColaCheckin);
-            }
-        }
+    int cantPuestos;
+    int capacidadColaCheckin = 2;
+    BlockingQueue<Thread>[] colaCheckin;
+    Semaphore[] semCheckin;
 
-        public void hacerChecking(int puestoCheckin) {
-            Thread pasajero = Thread.currentThread();
-            try {
-                colaCheckin[puestoCheckin].put(pasajero);
-            } catch (InterruptedException ex) {
-                Logger.getLogger(GestorCheckin.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            System.out.println("El " + pasajero.getName() + " está haciendo cola en el puesto de Checkin " + puestoCheckin);
-            //synchronized (pasajero) {
-                pasajero.suspend(); // suspender  al pasajero para que continúe en la cola de check-in              
-          //  }
+    public GestorCheckin(int cantPuestosCheckin) {
+        this.cantPuestos = cantPuestosCheckin;
+        colaCheckin = new BlockingQueue[cantPuestos];
+        semCheckin = new Semaphore[cantPuestos];
+        for (int i = 0; i < this.cantPuestos; i++) {
+            colaCheckin[i] = new LinkedBlockingQueue<>(capacidadColaCheckin);
+            semCheckin[i] = new Semaphore(0);
         }
+    }
 
-        public void atenderPuestoCheckin(int puestoCheckin) {
-            Thread pasajero = null;
-            Thread puesto = Thread.currentThread();
-            synchronized (puesto) {
-                try {
-                    pasajero = colaCheckin[puestoCheckin].take(); // El siguiente pasajero en la cola de espera
-                } catch (InterruptedException ex) {
-                    Logger.getLogger(GestorCheckin.class.getName()).log(Level.SEVERE, null, ex);
-                }
-                pasajero.resume(); // reanudar el hilo pasajero
-                //System.out.println("El " + pasajero.getName() + " hizo el Checkin en el puesto " + puestoCheckin);
-            }
+    public void hacerChecking(int puestoCheckin) {
+        Thread pasajero = Thread.currentThread();
+        try {
+            colaCheckin[puestoCheckin].put(pasajero);
+        } catch (InterruptedException ex) {
+            Logger.getLogger(GestorCheckin.class.getName()).log(Level.SEVERE, null, ex);
         }
+        System.out.println("El " + pasajero.getName() + " está haciendo cola en el puesto de Checkin " + puestoCheckin);
+        try {
+            semCheckin[puestoCheckin].acquire();
+        } catch (InterruptedException ex) {
+            Logger.getLogger(GestorCheckin.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    public void esperarPasajero(int puestoCheckin) {
+        try {
+            colaCheckin[puestoCheckin].take(); // El siguiente pasajero en la cola de espera
+        } catch (InterruptedException ex) {
+            Logger.getLogger(GestorCheckin.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+     public void atenderPuestoCheckin(int puestoCheckin) {
+        semCheckin[puestoCheckin].release();
+    }
 }

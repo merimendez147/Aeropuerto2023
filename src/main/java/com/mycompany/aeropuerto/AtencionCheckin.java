@@ -23,16 +23,21 @@ public class AtencionCheckin implements Runnable {
             this.gestorCheckin = gestorCheckin;
             this.nroPuesto = puestoCheckin;
         }
+        
+        private void atender(){
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException ex) {
+                Logger.getLogger(AtencionCheckin.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
 
         @Override
         public void run() {
-            while (true) {
-                try {
-                    Thread.sleep(1000);
+            while (true) {              
+                    gestorCheckin.esperarPasajero(nroPuesto);
+                    atender();           
                     gestorCheckin.atenderPuestoCheckin(nroPuesto);
-                } catch (InterruptedException ex) {
-                    Logger.getLogger(AtencionCheckin.class.getName()).log(Level.SEVERE, null, ex);
-                }
             }
         }
     }

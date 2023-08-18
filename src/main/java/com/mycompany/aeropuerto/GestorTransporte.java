@@ -4,37 +4,48 @@
  */
 package com.mycompany.aeropuerto;
 
+import java.util.HashMap;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.Semaphore;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 /**
  *
- * @author Maria Elisa Mendez Cares
- * Legajo: 61921
- * Carrera: Profesorado de Informatica
- * Email: maria.mendez@est.fi.uncoma.edu.ar
+ * @author Maria Elisa Mendez Cares Legajo: 61921 Carrera: Profesorado de
+ * Informatica Email: maria.mendez@est.fi.uncoma.edu.ar
  */
 public class GestorTransporte {
 
-    Semaphore semTrenParado, mutexContador;
-    CyclicBarrier inicioTrayecto, finTrayecto;
-    int capacidadTren, terminalA, terminalB, terminalC;
-    private final Semaphore[] turnoBajarTren = new Semaphore[3];
+    Semaphore semTrenParado;//Este semáforo controla la cantidad de pasajeros que pueden subir al tren. Se inicializa con la capacidad total del tren.
+    Semaphore mutexTrenVacio; //Este semáforo asegura que la variable trenVacio sea actualizada de manera exclusiva.
+    Semaphore[] mutexContador;//Un array de semáforos que protege el acceso concurrente a los contadores de pasajeros en cada terminal.
+    CyclicBarrier inicioTrayecto;// Una barrera cíclica que se utiliza para sincronizar el inicio del trayecto del tren cuando se ha subido la cantidad completa de pasajeros.
+    int capacidadTren; // La capacidad total del tren
+    int trenVacio;//Un contador que controla cuántos pasajeros han bajado del tren
+    HashMap<Character, Integer> terminales = new HashMap<>();// Un hashmap que asocia cada terminal con un índice numérico (0, 1 o 2).
+    Semaphore[] turnoBajarTren;//Un array de semáforos que permite que los pasajeros bajen del tren en el orden correcto según su turno.
+    int[] contadorPasjeros;//Un array que almacena el contador de pasajeros para cada terminal.
 
     public GestorTransporte(int capacidadT) {
+        terminales.put('A', 0);
+        terminales.put('B', 1);
+        terminales.put('C', 2);
+        int cantTerminales = 3;
+        trenVacio = capacidadT;
+        mutexTrenVacio = new Semaphore(1);
+        turnoBajarTren = new Semaphore[cantTerminales];
+        mutexContador = new Semaphore[cantTerminales];
+        contadorPasjeros = new int[cantTerminales];
         this.capacidadTren = capacidadT;
         inicioTrayecto = new CyclicBarrier(capacidadTren);
-        finTrayecto = new CyclicBarrier(capacidadTren);
         semTrenParado = new Semaphore(capacidadTren);
-        mutexContador = new Semaphore(1);
-        terminalA = 0;
-        terminalB = 0;
-        terminalC = 0;
-        turnoBajarTren[0] = new Semaphore(0, true);
-        turnoBajarTren[1] = new Semaphore(0, true);
-        turnoBajarTren[2] = new Semaphore(0, true);
+        for (int i = 0; i < cantTerminales; i++) {
+            mutexContador[i] = new Semaphore(1);
+            contadorPasjeros[i] = 0;
+            turnoBajarTren[i] = new Semaphore(0, true);
+        }
     }
 
     public void subirTren(char terminal) {
@@ -43,24 +54,10 @@ public class GestorTransporte {
         } catch (InterruptedException ex) {
             Logger.getLogger(GestorTransporte.class.getName()).log(Level.SEVERE, null, ex);
         }
+        incrementarContador(terminales.get(terminal));
+        System.out.println("El " + Thread.currentThread().getName() + " subio al tren y tiene que ir a la terminal " + terminal);
         try {
-            switch (terminal) {
-                case 'A' -> {
-                    incrementarContador('A');
-                    System.out.println("El " + Thread.currentThread().getName() + " subio al tren y tiene que ir a la terminal " + terminal);
-                }
-                case 'B' -> {
-                    incrementarContador('B');
-                    System.out.println("El " + Thread.currentThread().getName() + " subio al tren y tiene que ir a la terminal " + terminal);
-                }
-                case 'C' -> {
-                    incrementarContador('C');
-                    System.out.println("El " + Thread.currentThread().getName() + " subio al tren y tiene que ir a la terminal " + terminal);
-                }
-
-            }
-            int trenCompleto = inicioTrayecto.await();
-            if (trenCompleto == 0) {
+            if (inicioTrayecto.await() == 0) {
                 System.out.println("------------------------El tren sale completo---------------------------");
                 asignarPrimerTurno();
                 inicioTrayecto.reset();
@@ -71,164 +68,110 @@ public class GestorTransporte {
     }
 
     public void bajarTren(char terminal) {
-        switch (terminal) {
-            case 'A' -> {
-                esTurno('A');
-                System.out.println("El " + Thread.currentThread().getName() + " baja en la terminal " + terminal);
-                decrementarContador('A');
-                if (ultimoPasajero('A')) {
-                    asignarSiguienteTurno('A');
-                }
-            }
-            case 'B' -> {
-                esTurno('B');
-                System.out.println("El " + Thread.currentThread().getName() + " baja en la terminal " + terminal);
-                decrementarContador('B');
-                if (ultimoPasajero('B')) {
-                    asignarSiguienteTurno('B');
-                }
-            }
-            case 'C' -> {
-                esTurno('C');
-                System.out.println("El " + Thread.currentThread().getName() + " baja en la terminal " + terminal);
-                decrementarContador('C');
-                if (ultimoPasajero('C')) {
-                    asignarSiguienteTurno('C');
-                }
-            }
+        esTurno(terminales.get(terminal));
+        System.out.println("El " + Thread.currentThread().getName() + " baja en la terminal " + terminal);
+        decrementarContador(terminales.get(terminal));
+        if (ultimoPasajero(terminales.get(terminal))) {
+            avanzarSiguienteEstacion(terminal);
+            asignarSiguienteTurno(terminales.get(terminal));
         }
-        int trenCompleto = 0;
         try {
-            trenCompleto = finTrayecto.await();
-        } catch (InterruptedException | BrokenBarrierException ex) {
+            mutexTrenVacio.acquire();
+        } catch (InterruptedException ex) {
             Logger.getLogger(GestorTransporte.class.getName()).log(Level.SEVERE, null, ex);
         }
-        if (trenCompleto == 0) {
+        trenVacio--;
+        if (trenVacio == 0) {
             System.out.println("------------------------El tren vuelve vacio---------------------------");
             semTrenParado.release(capacidadTren);
-            finTrayecto.reset();
         }
+        mutexTrenVacio.release();
     }
 
-    private void incrementarContador(char terminal) {
+    private void incrementarContador(int indice) {
         try {
-            mutexContador.acquire();
+            mutexContador[indice].acquire();
         } catch (InterruptedException ex) {
             Logger.getLogger(GestorTransporte.class.getName()).log(Level.SEVERE, null, ex);
         }
-        switch (terminal) {
-            case 'A' -> {
-                terminalA++;
-            }
-            case 'B' -> {
-                terminalB++;
-            }
-            case 'C' -> {
-                terminalC++;
-            }
-        }
-        mutexContador.release();
+        contadorPasjeros[indice]++;
+        mutexContador[indice].release();
     }
 
-    private void decrementarContador(char terminal) {
+    private void avanzarSiguienteEstacion(char terminal) {
         try {
-            mutexContador.acquire();
+            Thread.sleep(2000);
         } catch (InterruptedException ex) {
             Logger.getLogger(GestorTransporte.class.getName()).log(Level.SEVERE, null, ex);
         }
-        switch (terminal) {
-            case 'A' -> {
-                terminalA--;
-            }
-            case 'B' -> {
-                terminalB--;
-            }
-            case 'C' -> {
-                terminalC--;
-            }
+        System.out.println("------------------Bajaron todos los pasajeros en la terminal " + terminal + " ----------------");
+    }
+
+    private void decrementarContador(int indice) {
+        try {
+            mutexContador[indice].acquire();
+        } catch (InterruptedException ex) {
+            Logger.getLogger(GestorTransporte.class.getName()).log(Level.SEVERE, null, ex);
         }
-        mutexContador.release();
+        contadorPasjeros[indice]--;
+        mutexContador[indice].release();
     }
 
     private void asignarPrimerTurno() {
-        try {
-            mutexContador.acquire();
-        } catch (InterruptedException ex) {
-            Logger.getLogger(GestorTransporte.class.getName()).log(Level.SEVERE, null, ex);
+        if (contadorPasjeros[0] > 0) {
+            turnoBajarTren[0].release(contadorPasjeros[0]);
+        } else if (contadorPasjeros[1] > 0) {
+            turnoBajarTren[1].release(contadorPasjeros[1]);
+        } else if (contadorPasjeros[2] > 0) {
+            turnoBajarTren[2].release(contadorPasjeros[2]);
         }
-        if (terminalA > 0) {
-            turnoBajarTren[0].release(terminalA);
-        } else if (terminalB > 0) {
-            turnoBajarTren[1].release(terminalB);
-        } else if (terminalC > 0) {
-            turnoBajarTren[2].release(terminalC);
-        }
-        mutexContador.release();
     }
 
-    private void asignarSiguienteTurno(char terminal) {
-        switch (terminal) {
-            case 'A' -> {
-                if (terminalB > 0) {
-                    turnoBajarTren[1].release(terminalB);
+    private void asignarSiguienteTurno(int indice) {
+        if (indice == 0) {
+            try {
+                mutexContador[1].acquire();
+                mutexContador[2].acquire();
+                if (contadorPasjeros[1] > 0) {
+                    turnoBajarTren[1].release(contadorPasjeros[1]);
                 } else {
-                    turnoBajarTren[2].release(terminalC);
+                    turnoBajarTren[2].release(contadorPasjeros[2]);
                 }
+                mutexContador[1].release();
+                mutexContador[2].release();
+            } catch (InterruptedException ex) {
+                Logger.getLogger(GestorTransporte.class.getName()).log(Level.SEVERE, null, ex);
             }
-            case 'B' -> {
-                turnoBajarTren[2].release(terminalC);
-            }
-            case 'C' -> {
-                turnoBajarTren[0].release(terminalA);
+        } else if (indice == 1) {
+            try {
+                mutexContador[2].acquire();
+                turnoBajarTren[2].release(contadorPasjeros[2]);
+                mutexContador[2].release();
+            } catch (InterruptedException ex) {
+                Logger.getLogger(GestorTransporte.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
     }
 
-    private boolean ultimoPasajero(char terminal) {
-        boolean ultimo = false;
+    private boolean ultimoPasajero(int indice) {
+        boolean ultimo;
         try {
-            mutexContador.acquire();
+            mutexContador[indice].acquire();
         } catch (InterruptedException ex) {
-            Logger.getLogger(GestorTransporte.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(GestorTransporte.class
+                    .getName()).log(Level.SEVERE, null, ex);
         }
-        switch (terminal) {
-            case 'A' -> {
-                ultimo = terminalA == 0;
-            }
-            case 'B' -> {
-                ultimo = terminalB == 0;
-            }
-            case 'C' -> {
-                ultimo = terminalC == 0;
-            }
-        }
-        mutexContador.release();
+        ultimo = contadorPasjeros[indice] == 0;
+        mutexContador[indice].release();
         return ultimo;
     }
 
-    private void esTurno(char terminal) {
-        switch (terminal) {
-            case 'A' -> {
-                try {
-                    turnoBajarTren[0].acquire();
-                } catch (InterruptedException ex) {
-                    Logger.getLogger(GestorTransporte.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }
-            case 'B' -> {
-                try {
-                    turnoBajarTren[1].acquire();
-                } catch (InterruptedException ex) {
-                    Logger.getLogger(GestorTransporte.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }
-            case 'C' -> {
-                try {
-                    turnoBajarTren[2].acquire();
-                } catch (InterruptedException ex) {
-                    Logger.getLogger(GestorTransporte.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }
+    private void esTurno(int indice) {
+        try {
+            turnoBajarTren[indice].acquire();
+        } catch (InterruptedException ex) {
+            Logger.getLogger(GestorTransporte.class
+                    .getName()).log(Level.SEVERE, null, ex);
         }
     }
 }
